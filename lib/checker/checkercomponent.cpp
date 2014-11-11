@@ -30,6 +30,7 @@
 #include "base/exception.hpp"
 #include "base/convert.hpp"
 #include "base/statsfunction.hpp"
+#include "base/gc.hpp"
 
 using namespace icinga;
 
@@ -73,8 +74,7 @@ void CheckerComponent::Start(bool runtimeCreated)
 	Log(LogInformation, "CheckerComponent")
 		<< "'" << GetName() << "' started.";
 
-
-	m_Thread = std::thread(std::bind(&CheckerComponent::CheckThreadProc, this));
+	m_Thread = std::thread(GC::WrapThread(std::bind(&CheckerComponent::CheckThreadProc, this)));
 
 	m_ResultTimer = new Timer();
 	m_ResultTimer->SetInterval(5);

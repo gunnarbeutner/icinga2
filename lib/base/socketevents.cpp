@@ -22,6 +22,7 @@
 #include "base/logger.hpp"
 #include "base/application.hpp"
 #include "base/scriptglobal.hpp"
+#include "base/gc.hpp"
 #include <boost/thread/once.hpp>
 #include <map>
 #ifdef __linux__
@@ -50,7 +51,7 @@ void SocketEventEngine::Start()
 
 		InitializeThread(tid);
 
-		m_Threads[tid] = std::thread(std::bind(&SocketEventEngine::ThreadProc, this, tid));
+		m_Threads[tid] = std::thread(GC::WrapThread(std::bind(&SocketEventEngine::ThreadProc, this, tid)));
 	}
 }
 

@@ -213,74 +213,57 @@ Value icinga::GetPrototypeField(const Value& context, const String& field, bool 
 		return Empty;
 }
 
-#ifdef I2_LEAK_DEBUG
-void icinga::TypeAddObject(Object *object)
+#pragma GCC visibility push(hidden)
+
+extern "C++" {
+
+void *operator new(size_t size)
 {
-	boost::mutex::scoped_lock lock(l_ObjectCountLock);
-	String typeName = Utility::GetTypeName(typeid(*object));
-	l_ObjectCounts[typeName]++;
+	GC::Initialize();
+	return GC_malloc(size);
 }
 
-void icinga::TypeRemoveObject(Object *object)
+void *operator new[](size_t size)
 {
-	boost::mutex::scoped_lock lock(l_ObjectCountLock);
-	String typeName = Utility::GetTypeName(typeid(*object));
-	l_ObjectCounts[typeName]--;
+	GC::Initialize();
+	return GC_malloc(size);
 }
 
-static void TypeInfoTimerHandler()
+void *operator new(size_t size, const std::nothrow_t& tag) noexcept
 {
-	boost::mutex::scoped_lock lock(l_ObjectCountLock);
-
-	typedef std::map<String, int>::value_type kv_pair;
-	for (kv_pair& kv : l_ObjectCounts) {
-		if (kv.second == 0)
-			continue;
-
-		Log(LogInformation, "TypeInfo")
-			<< kv.second << " " << kv.first << " objects";
-
-		kv.second = 0;
-	}
+	GC::Initialize();
+	return GC_malloc(size);
 }
 
-INITIALIZE_ONCE([]() {
-	l_ObjectCountTimer = new Timer();
-	l_ObjectCountTimer->SetInterval(10);
-	l_ObjectCountTimer->OnTimerExpired.connect(std::bind(TypeInfoTimerHandler));
-	l_ObjectCountTimer->Start();
-});
-#endif /* I2_LEAK_DEBUG */
+void *operator new[](size_t size, const std::nothrow_t& tag) noexcept
+{
+	GC::Initialize();
+	return GC_malloc(size);
+}
+
+void operator delete(void *ptr) noexcept
+{
+}
+
+void operator delete[](void *ptr) noexcept
+{
+}
+
+void operator delete(void *ptr, const std::nothrow_t& tag) noexcept
+{
+}
+
+void operator delete[](void *ptr, const std::nothrow_t& tag) noexcept
+{
+}
+
+}
 
 void icinga::intrusive_ptr_add_ref(Object *object)
 {
-#ifdef I2_LEAK_DEBUG
-	if (object->m_References == 0)
-		TypeAddObject(object);
-#endif /* I2_LEAK_DEBUG */
-
-#ifdef _WIN32
-	InterlockedIncrement(&object->m_References);
-#else /* _WIN32 */
-	__sync_add_and_fetch(&object->m_References, 1);
-#endif /* _WIN32 */
 }
 
 void icinga::intrusive_ptr_release(Object *object)
 {
-	uintptr_t refs;
-
-#ifdef _WIN32
-	refs = InterlockedDecrement(&object->m_References);
-#else /* _WIN32 */
-	refs = __sync_sub_and_fetch(&object->m_References, 1);
-#endif /* _WIN32 */
-
-	if (unlikely(refs == 0)) {
-#ifdef I2_LEAK_DEBUG
-		TypeRemoveObject(object);
-#endif /* I2_LEAK_DEBUG */
-
-		delete object;
-	}
 }
+#pragma GCC visibility pop

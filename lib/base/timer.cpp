@@ -20,6 +20,7 @@
 #include "base/timer.hpp"
 #include "base/debug.hpp"
 #include "base/utility.hpp"
+#include "base/gc.hpp"
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/multi_index_container.hpp>
@@ -63,7 +64,8 @@ typedef boost::multi_index_container<
 	boost::multi_index::indexed_by<
 		boost::multi_index::ordered_unique<boost::multi_index::const_mem_fun<TimerHolder, Timer *, &TimerHolder::GetObject> >,
 		boost::multi_index::ordered_non_unique<boost::multi_index::const_mem_fun<TimerHolder, double, &TimerHolder::GetNextUnlocked> >
-	>
+	>,
+	gc_allocator<TimerHolder>
 > TimerSet;
 
 static boost::mutex l_TimerMutex;
@@ -142,7 +144,7 @@ void Timer::Start()
 
 		if (l_AliveTimers++ == 0) {
 			l_StopTimerThread = false;
-			l_TimerThread = std::thread(&Timer::TimerThreadProc);
+			l_TimerThread = std::thread(GC::WrapThread(&Timer::TimerThreadProc));
 		}
 	}
 

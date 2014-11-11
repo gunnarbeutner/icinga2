@@ -46,6 +46,7 @@ set(base_SOURCES
   fifo.cpp fifo.hpp
   filelogger.cpp filelogger.hpp filelogger.thpp
   function.cpp function.hpp function.thpp function-script.cpp functionwrapper.hpp
+  gc.cpp gc-script.cpp
   initialize.cpp initialize.hpp
   json.cpp json.hpp json-script.cpp
   library.cpp library.hpp

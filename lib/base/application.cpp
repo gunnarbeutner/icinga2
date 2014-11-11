@@ -31,6 +31,7 @@
 #include "base/convert.hpp"
 #include "base/scriptglobal.hpp"
 #include "base/process.hpp"
+#include "base/gc.hpp"
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -128,6 +129,10 @@ void Application::Exit(int rc)
 	}
 
 	UninitializeBase();
+
+	GC_enable();
+	GC_gcollect();
+
 #ifdef I2_DEBUG
 	exit(rc);
 #else /* I2_DEBUG */
@@ -137,6 +142,8 @@ void Application::Exit(int rc)
 
 void Application::InitializeBase()
 {
+	GC::Initialize();
+
 #ifdef _WIN32
 	/* disable GUI-based error messages for LoadLibrary() */
 	SetErrorMode(SEM_FAILCRITICALERRORS);
@@ -391,7 +398,7 @@ static void ReloadProcessCallback(const ProcessResult& pr)
 {
 	l_Restarting = false;
 
-	std::thread t(std::bind(&ReloadProcessCallbackInternal, pr));
+	std::thread t(GC::WrapThread(std::bind(&ReloadProcessCallbackInternal, pr)));
 	t.detach();
 }
 

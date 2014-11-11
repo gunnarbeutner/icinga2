@@ -22,6 +22,7 @@
 
 #include "base/i2-base.hpp"
 #include "base/debug.hpp"
+#include "base/gc.hpp"
 #include <boost/thread/condition_variable.hpp>
 #include <boost/smart_ptr/intrusive_ptr.hpp>
 #include <vector>
@@ -161,7 +162,7 @@ private:
  *
  * @ingroup base
  */
-class Object
+class Object : public GCObject
 {
 public:
 	DECLARE_PTR_TYPEDEFS(Object);
@@ -199,7 +200,6 @@ private:
 	Object(const Object& other) = delete;
 	Object& operator=(const Object& rhs) = delete;
 
-	uintptr_t m_References{0};
 	mutable uintptr_t m_Mutex{0};
 
 #ifdef I2_DEBUG

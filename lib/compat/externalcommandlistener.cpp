@@ -25,6 +25,7 @@
 #include "base/exception.hpp"
 #include "base/application.hpp"
 #include "base/statsfunction.hpp"
+#include "base/gc.hpp"
 
 using namespace icinga;
 
@@ -54,7 +55,7 @@ void ExternalCommandListener::Start(bool runtimeCreated)
 		<< "'" << GetName() << "' started.";
 
 #ifndef _WIN32
-	m_CommandThread = std::thread(std::bind(&ExternalCommandListener::CommandPipeThread, this, GetCommandPath()));
+	m_CommandThread = std::thread(GC::WrapThread(std::bind(&ExternalCommandListener::CommandPipeThread, this, GetCommandPath())));
 	m_CommandThread.detach();
 #endif /* _WIN32 */
 }
