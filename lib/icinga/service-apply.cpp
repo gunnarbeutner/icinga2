@@ -61,6 +61,7 @@ bool Service::EvaluateApplyRuleInstance(const Host::Ptr& host, const String& nam
 		builder->AddExpression(new SetExpression(MakeIndexer(ScopeThis, "zone"), OpSetLiteral, MakeLiteral(zone), di));
 
 	builder->AddExpression(new SetExpression(MakeIndexer(ScopeThis, "package"), OpSetLiteral, MakeLiteral(rule.GetPackage()), di));
+	builder->AddExpression(new SetExpression(MakeIndexer(ScopeThis, "creation_type"), OpSetLiteral, MakeLiteral("apply"), di));
 
 	builder->AddExpression(new OwnedExpression(rule.GetExpression()));
 

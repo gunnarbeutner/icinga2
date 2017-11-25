@@ -67,7 +67,8 @@ bool Dependency::EvaluateApplyRuleInstance(const Checkable::Ptr& checkable, cons
 	if (!zone.IsEmpty())
 		builder->AddExpression(new SetExpression(MakeIndexer(ScopeThis, "zone"), OpSetLiteral, MakeLiteral(zone), di));
 
-	builder->AddExpression(new SetExpression(MakeIndexer(ScopeThis, "package"), OpSetLiteral, MakeLiteral(rule.GetPackage()), di));
+	builder->SetPackage(rule.GetPackage());
+	builder->SetCreationType("object");
 
 	builder->AddExpression(new ImportDefaultTemplatesExpression());
 

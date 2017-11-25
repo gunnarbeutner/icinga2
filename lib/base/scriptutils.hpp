@@ -26,6 +26,7 @@
 #include "base/dictionary.hpp"
 #include "base/type.hpp"
 #include "base/configobject.hpp"
+#include "base/function.hpp"
 
 namespace icinga
 {

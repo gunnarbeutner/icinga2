@@ -182,6 +182,7 @@ public:
 		item->SetScope(EvaluateClosedVars(frame, closedVars));
 		item->SetZone(zone);
 		item->SetPackage(package);
+		item->SetCreationType("object");
 		item->SetFilter(filter);
 		item->SetDefaultTemplate(defaultTmpl);
 		item->SetIgnoreOnError(ignoreOnError);

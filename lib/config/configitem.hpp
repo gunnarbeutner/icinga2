@@ -45,7 +45,7 @@ public:
 	    const std::shared_ptr<Expression>& filter,
 	    bool defaultTmpl, bool ignoreOnError, const DebugInfo& debuginfo,
 	    const Dictionary::Ptr& scope, const String& zone,
-	    const String& package);
+	    const String& package, const String& creationType);
 
 	Type::Ptr GetType(void) const;
 	String GetName(void) const;
@@ -73,6 +73,7 @@ public:
 	static bool ActivateItems(WorkQueue& upq, const std::vector<ConfigItem::Ptr>& newItems, bool runtimeCreated = false, bool silent = false, bool withModAttrs = false);
 
 	static bool RunWithActivationContext(const Function::Ptr& function);
+	static void ReloadObject(const ConfigObject::Ptr& object, const Function::Ptr& callback);
 
 	static std::vector<ConfigItem::Ptr> GetItems(const Type::Ptr& type);
 	static std::vector<ConfigItem::Ptr> GetDefaultTemplates(const Type::Ptr& type);
@@ -92,6 +93,7 @@ private:
 	Dictionary::Ptr m_Scope; /**< variable scope. */
 	String m_Zone; /**< The zone. */
 	String m_Package;
+	String m_CreationType;
 	ActivationContext::Ptr m_ActivationContext;
 
 	ConfigObject::Ptr m_Object;

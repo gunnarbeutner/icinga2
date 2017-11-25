@@ -84,6 +84,7 @@ abstract class ConfigObject : ConfigObjectBase < ConfigType
 	};
 	[config, no_user_modify] name(Zone) zone (ZoneName);
 	[config, no_user_modify] String package;
+	[no_user_modify] String creation_type;
 	[config, get_protected, no_user_modify] Array::Ptr templates;
 	[config, no_storage, no_user_modify] Dictionary::Ptr source_location {
 		get;

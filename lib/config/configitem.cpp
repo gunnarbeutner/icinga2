@@ -36,6 +36,7 @@
 #include "base/json.hpp"
 #include "base/exception.hpp"
 #include "base/function.hpp"
+#include "base/dependencygraph.hpp"
 #include <sstream>
 #include <fstream>
 
@@ -48,6 +49,7 @@ ConfigItem::ItemList ConfigItem::m_UnnamedItems;
 ConfigItem::IgnoredItemList ConfigItem::m_IgnoredItems;
 
 REGISTER_SCRIPTFUNCTION_NS(Internal, run_with_activation_context, &ConfigItem::RunWithActivationContext, "func");
+REGISTER_SCRIPTFUNCTION_NS(Internal, reload_object, &ConfigItem::ReloadObject, "object:callback");
 
 /**
  * Constructor for the ConfigItem class.
@@ -63,12 +65,12 @@ ConfigItem::ConfigItem(const Type::Ptr& type, const String& name,
     bool abstract, const std::shared_ptr<Expression>& exprl,
     const std::shared_ptr<Expression>& filter, bool defaultTmpl, bool ignoreOnError,
     const DebugInfo& debuginfo, const Dictionary::Ptr& scope,
-    const String& zone, const String& package)
+    const String& zone, const String& package, const String& creationType)
 	: m_Type(type), m_Name(name), m_Abstract(abstract),
 	  m_Expression(exprl), m_Filter(filter),
 	  m_DefaultTmpl(defaultTmpl), m_IgnoreOnError(ignoreOnError),
 	  m_DebugInfo(debuginfo), m_Scope(scope), m_Zone(zone),
-	  m_Package(package)
+	  m_Package(package), m_CreationType(creationType)
 {
 }
 
@@ -192,6 +194,7 @@ ConfigObject::Ptr ConfigItem::Commit(bool discard)
 	dobj->SetDebugInfo(m_DebugInfo);
 	dobj->SetZoneName(m_Zone);
 	dobj->SetPackage(m_Package);
+	dobj->SetCreationType(m_CreationType);
 	dobj->SetName(m_Name);
 
 	DebugHint debugHints;
@@ -736,4 +739,109 @@ void ConfigItem::RemoveIgnoredItems(const String& allowedConfigPath)
 	}
 
 	m_IgnoredItems.clear();
+}
+
+struct DeletedObjectInfo
+{
+	ConfigObject::Ptr Object;
+	ConfigItem::Ptr Item;
+
+	DeletedObjectInfo(const ConfigObject::Ptr& object, const ConfigItem::Ptr& item)
+	    : Object(object), Item(item)
+	{ }
+};
+
+static void DeleteObjectHelper(const ConfigObject::Ptr& object, std::vector<DeletedObjectInfo>& deletedObjects)
+{
+	ConfigItem::Ptr item = ConfigItem::GetByTypeAndName(object->GetReflectionType(), object->GetName());
+
+	deletedObjects.emplace_back(object, item);
+
+	std::vector<Object::Ptr> parents = DependencyGraph::GetParents(object);
+
+	for (const Object::Ptr& pobj : parents) {
+		ConfigObject::Ptr parentObj = dynamic_pointer_cast<ConfigObject>(pobj);
+
+		if (!parentObj)
+			continue;
+
+		DeleteObjectHelper(parentObj, deletedObjects);
+	}
+
+	Type::Ptr type = object->GetReflectionType();
+	String name = object->GetName();
+	::Log(LogWarning, "ReloadObject")
+	    << "Deactivating object '" << name << "' of type '" << type->GetName() << "'.";
+
+	/* mark this object for cluster delete event */
+	object->SetExtension("ConfigObjectDeleted", true);
+	/* triggers signal for DB IDO and other interfaces */
+	object->Deactivate(true);
+
+	if (item)
+		item->Unregister();
+	else
+		object->Unregister();
+}
+
+static void RestoreObjectsHelper(const std::vector<DeletedObjectInfo> deletedObjects, bool recoverApply)
+{
+	ActivationScope scope;
+
+	for (const auto& doi : deletedObjects) {
+		const ConfigObject::Ptr& deletedObject = doi.Object;
+		Type::Ptr type = deletedObject->GetReflectionType();
+		String name = deletedObject->GetName();
+
+		ConfigType *ctype = dynamic_cast<ConfigType *>(type.get());
+		ConfigObject::Ptr newObject = ctype->GetObject(name);
+
+		if (newObject) {
+			::Log(LogWarning, "ReloadObject")
+			    << "Restoring state for newly-created object '" << name << "' of type '" << type->GetName() << "'.";
+
+			Deserialize(newObject, Serialize(deletedObject, FAState), false, FAState);
+		} else if (recoverApply || deletedObject->GetCreationType() == "object") {
+			::Log(LogWarning, "ReloadObject")
+			    << "Recovering object '" << name << "' of type '" << type->GetName() << "'.";
+
+			deletedObject->SetExtension("ConfigObjectDeleted", false);
+
+			if (doi.Item)
+				doi.Item->Register();
+
+			deletedObject->OnConfigLoaded();
+
+			deletedObject->Register();
+
+			deletedObject->OnAllConfigLoaded();
+
+			deletedObject->PreActivate();
+			deletedObject->Activate(true);
+		}
+	}
+}
+
+void ConfigItem::ReloadObject(const ConfigObject::Ptr& object, const Function::Ptr& callback)
+{
+	std::vector<DeletedObjectInfo> deletedObjects;
+	DeleteObjectHelper(object, deletedObjects);
+
+	try {
+		RunWithActivationContext(callback);
+
+		Type::Ptr type = object->GetReflectionType();
+		String name = object->GetName();
+
+		ConfigType *ctype = dynamic_cast<ConfigType *>(type.get());
+		if (!ctype->GetObject(name))
+			BOOST_THROW_EXCEPTION(ScriptError("Callback failed to re-create the object."));
+
+	} catch (const std::exception&) {
+		RestoreObjectsHelper(deletedObjects, true);
+
+		throw;
+	}
+
+	RestoreObjectsHelper(deletedObjects, false);
 }
