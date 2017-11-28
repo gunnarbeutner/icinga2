@@ -72,8 +72,8 @@ public:
 	static bool CommitItems(const ActivationContext::Ptr& context, WorkQueue& upq, std::vector<ConfigItem::Ptr>& newItems, bool silent = false);
 	static bool ActivateItems(WorkQueue& upq, const std::vector<ConfigItem::Ptr>& newItems, bool runtimeCreated = false, bool silent = false, bool withModAttrs = false);
 
-	static bool RunWithActivationContext(const Function::Ptr& function);
-	static void ReloadObject(const ConfigObject::Ptr& object, const Function::Ptr& callback);
+	static bool RunWithActivationContext(const std::vector<Value>& args);
+	static void ReloadObject(const ConfigObject::Ptr& object, bool destroyFirst, const Function::Ptr& callback);
 
 	static std::vector<ConfigItem::Ptr> GetItems(const Type::Ptr& type);
 	static std::vector<ConfigItem::Ptr> GetDefaultTemplates(const Type::Ptr& type);

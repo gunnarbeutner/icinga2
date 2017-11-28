@@ -18,6 +18,7 @@
  ******************************************************************************/
 
 #include "config/configitem.hpp"
+#include "config/configitembuilder.hpp"
 #include "config/configcompilercontext.hpp"
 #include "config/applyrule.hpp"
 #include "config/objectrule.hpp"
@@ -49,7 +50,7 @@ ConfigItem::ItemList ConfigItem::m_UnnamedItems;
 ConfigItem::IgnoredItemList ConfigItem::m_IgnoredItems;
 
 REGISTER_SCRIPTFUNCTION_NS(Internal, run_with_activation_context, &ConfigItem::RunWithActivationContext, "func");
-REGISTER_SCRIPTFUNCTION_NS(Internal, reload_object, &ConfigItem::ReloadObject, "object:callback");
+REGISTER_SCRIPTFUNCTION_NS(Internal, reload_object, &ConfigItem::ReloadObject, "object:destroy:callback");
 
 /**
  * Constructor for the ConfigItem class.
@@ -661,14 +662,20 @@ bool ConfigItem::ActivateItems(WorkQueue& upq, const std::vector<ConfigItem::Ptr
 	return true;
 }
 
-bool ConfigItem::RunWithActivationContext(const Function::Ptr& function)
+bool ConfigItem::RunWithActivationContext(const std::vector<Value>& args)
 {
 	ActivationScope scope;
+
+	if (args.size() < 1)
+		BOOST_THROW_EXCEPTION(ScriptError("'function' argument must be specified."));
+
+	Function::Ptr function = args[0];
 
 	if (!function)
 		BOOST_THROW_EXCEPTION(ScriptError("'function' argument must not be null."));
 
-	function->Invoke();
+	std::vector<Value> uargs(args.begin() + 1, args.end());
+	function->Invoke(uargs);
 
 	WorkQueue upq(25000, Application::GetConcurrency());
 	upq.SetName("ConfigItem::RunWithActivationContext");
@@ -771,7 +778,7 @@ static void DeleteObjectHelper(const ConfigObject::Ptr& object, std::vector<Dele
 	Type::Ptr type = object->GetReflectionType();
 	String name = object->GetName();
 	::Log(LogWarning, "ReloadObject")
-	    << "Deactivating object '" << name << "' of type '" << type->GetName() << "'.";
+			<< "Deactivating object '" << name << "' of type '" << type->GetName() << "'.";
 
 	/* mark this object for cluster delete event */
 	object->SetExtension("ConfigObjectDeleted", true);
@@ -784,7 +791,7 @@ static void DeleteObjectHelper(const ConfigObject::Ptr& object, std::vector<Dele
 		object->Unregister();
 }
 
-static void RestoreObjectsHelper(const std::vector<DeletedObjectInfo> deletedObjects, bool recoverApply)
+static void RestoreObjectsHelper(const std::vector<DeletedObjectInfo>& deletedObjects, bool recoverApply)
 {
 	ActivationScope scope;
 
@@ -822,13 +829,72 @@ static void RestoreObjectsHelper(const std::vector<DeletedObjectInfo> deletedObj
 	}
 }
 
-void ConfigItem::ReloadObject(const ConfigObject::Ptr& object, const Function::Ptr& callback)
+/* This function shallow-clones all config attributes from the source object into the destination object. */
+static void MigrateObjectAttributes(const ConfigObject::Ptr& source, const ConfigObject::Ptr& destination)
 {
+	Type::Ptr type = source->GetReflectionType();
+
+	for (int fid = 0; fid < type->GetFieldCount(); fid++) {
+		Field field = type->GetFieldInfo(fid);
+
+		if (!(field.Attributes & FAConfig))
+			continue;
+
+		destination->SetField(fid, source->GetField(fid));
+	}
+}
+
+void ConfigItem::ReloadObject(const ConfigObject::Ptr& object, bool destroyFirst, const Function::Ptr& callback)
+{
+	if (!object)
+		BOOST_THROW_EXCEPTION(ScriptError("'object' argument must not be null."));
+
+	if (!callback)
+		BOOST_THROW_EXCEPTION(ScriptError("'callback' argument must not be null."));
+
 	std::vector<DeletedObjectInfo> deletedObjects;
 	DeleteObjectHelper(object, deletedObjects);
 
 	try {
-		RunWithActivationContext(callback);
+		if (!destroyFirst) {
+			void (*updateObjectFunc)(const ConfigObject::Ptr&, const Function::Ptr&) = [](const ConfigObject::Ptr& object, const Function::Ptr& callback) {
+				Type::Ptr type = object->GetReflectionType();
+				String name = object->GetName();
+
+				ConfigItemBuilder::Ptr builder = new ConfigItemBuilder();
+				builder->SetType(type);
+				builder->SetName(name);
+				builder->SetCreationType("object");
+
+				builder->AddExpression(new ImportDefaultTemplatesExpression());
+
+				/* Equivalent Icinga expression: MigrateObjectAttributes(object, this) */
+				FunctionCallExpression *migrationExpr = new FunctionCallExpression(
+				    MakeLiteral(new Function("<anonymous>", WrapFunction(MigrateObjectAttributes))),
+				    { MakeLiteral(object), new GetScopeExpression(ScopeThis) }
+				);
+
+				builder->AddExpression(migrationExpr);
+
+				/* Equivalent Icinga expression: callback.callv(this) */
+				FunctionCallExpression *updateExpr = new FunctionCallExpression(
+				    new IndexerExpression(MakeLiteral(callback), MakeLiteral("call")),
+					{ new GetScopeExpression(ScopeThis) }
+				);
+
+				builder->AddExpression(updateExpr);
+
+				ConfigItem::Ptr newItem = builder->Compile();
+				newItem->Register();
+			};
+
+			RunWithActivationContext({
+			    new Function("<anonymous>", WrapFunction(updateObjectFunc)),
+				object,
+				callback
+			});
+		} else
+			RunWithActivationContext({ callback });
 
 		Type::Ptr type = object->GetReflectionType();
 		String name = object->GetName();
@@ -836,7 +902,6 @@ void ConfigItem::ReloadObject(const ConfigObject::Ptr& object, const Function::P
 		ConfigType *ctype = dynamic_cast<ConfigType *>(type.get());
 		if (!ctype->GetObject(name))
 			BOOST_THROW_EXCEPTION(ScriptError("Callback failed to re-create the object."));
-
 	} catch (const std::exception&) {
 		RestoreObjectsHelper(deletedObjects, true);
 
