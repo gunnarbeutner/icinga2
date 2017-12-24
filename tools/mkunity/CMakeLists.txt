@@ -22,10 +22,10 @@ define_property(
   FULL_DOCS "Specified whether a source file should be excluded from unity builds and should be built separately"
 )
 
-if(ICINGA2_UNITY_BUILD)
-  set(mkunity_SOURCES
-    mkunity.c
-  )
+if(ICINGA2_UNITY_BUILD OR ICINGA2_PCH_BUILD)
+    set(mkunity_SOURCES
+      mkunity.c
+    )
 
   add_executable(mkunity ${mkunity_SOURCES})
 

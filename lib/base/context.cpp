@@ -19,7 +19,7 @@
 
 #include "base/context.hpp"
 #include <boost/thread/tss.hpp>
-#include <iostream>
+#include <ostream>
 
 using namespace icinga;
 

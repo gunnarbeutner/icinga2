@@ -42,6 +42,8 @@
 #include <sys/resource.h>
 #include <strings.h>
 #include <errno.h>
+#include <sched.h>
+#include <pthread.h>
 
 typedef int SOCKET;
 #define INVALID_SOCKET (-1)

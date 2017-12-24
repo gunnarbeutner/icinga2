@@ -27,11 +27,9 @@
 #include "base/utility.hpp"
 #include "base/loader.hpp"
 #include "base/debug.hpp"
-#include "base/type.hpp"
 #include "base/convert.hpp"
 #include "base/scriptglobal.hpp"
 #include "base/process.hpp"
-#include <boost/algorithm/string/trim.hpp>
 #include <boost/exception/errinfo_api_function.hpp>
 #include <boost/exception/errinfo_errno.hpp>
 #include <boost/exception/errinfo_file_name.hpp>

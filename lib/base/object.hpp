@@ -199,6 +199,10 @@ private:
 	Object(const Object& other) = delete;
 	Object& operator=(const Object& rhs) = delete;
 
+	static void *AllocateLockedMutex(void);
+	void LockMutex(void) const;
+	void UnlockMutex(void) const;
+
 	uintptr_t m_References{0};
 	mutable uintptr_t m_Mutex{0};
 

@@ -22,6 +22,7 @@
 
 #include "base/i2-base.hpp"
 #include "base/socket.hpp"
+#include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <thread>
 
