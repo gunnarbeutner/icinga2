@@ -55,9 +55,9 @@ public:
 	Array(std::initializer_list<Value> init);
 
 	Value Get(SizeType index) const;
-	void Set(SizeType index, const Value& value);
-	void Set(SizeType index, Value&& value);
-	void Add(Value value);
+	void Set(SizeType index, const Value& value, bool ignoreFrozen = false);
+	void Set(SizeType index, Value&& value, bool ignoreFrozen = false);
+	void Add(Value value, bool ignoreFrozen = false);
 
 	Iterator Begin();
 	Iterator End();

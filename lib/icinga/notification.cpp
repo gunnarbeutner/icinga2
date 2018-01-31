@@ -79,22 +79,22 @@ Dictionary::Ptr NotificationNameComposer::ParseName(const String& name) const
 
 void Notification::StaticInitialize()
 {
-	ScriptGlobal::Set("OK", "OK");
-	ScriptGlobal::Set("Warning", "Warning");
-	ScriptGlobal::Set("Critical", "Critical");
-	ScriptGlobal::Set("Unknown", "Unknown");
-	ScriptGlobal::Set("Up", "Up");
-	ScriptGlobal::Set("Down", "Down");
+	ScriptGlobal::Set("Constants.OK", "OK");
+	ScriptGlobal::Set("Constants.Warning", "Warning");
+	ScriptGlobal::Set("Constants.Critical", "Critical");
+	ScriptGlobal::Set("Constants.Unknown", "Unknown");
+	ScriptGlobal::Set("Constants.Up", "Up");
+	ScriptGlobal::Set("Constants.Down", "Down");
 
-	ScriptGlobal::Set("DowntimeStart", "DowntimeStart");
-	ScriptGlobal::Set("DowntimeEnd", "DowntimeEnd");
-	ScriptGlobal::Set("DowntimeRemoved", "DowntimeRemoved");
-	ScriptGlobal::Set("Custom", "Custom");
-	ScriptGlobal::Set("Acknowledgement", "Acknowledgement");
-	ScriptGlobal::Set("Problem", "Problem");
-	ScriptGlobal::Set("Recovery", "Recovery");
-	ScriptGlobal::Set("FlappingStart", "FlappingStart");
-	ScriptGlobal::Set("FlappingEnd", "FlappingEnd");
+	ScriptGlobal::Set("Constants.DowntimeStart", "DowntimeStart");
+	ScriptGlobal::Set("Constants.DowntimeEnd", "DowntimeEnd");
+	ScriptGlobal::Set("Constants.DowntimeRemoved", "DowntimeRemoved");
+	ScriptGlobal::Set("Constants.Custom", "Custom");
+	ScriptGlobal::Set("Constants.Acknowledgement", "Acknowledgement");
+	ScriptGlobal::Set("Constants.Problem", "Problem");
+	ScriptGlobal::Set("Constants.Recovery", "Recovery");
+	ScriptGlobal::Set("Constants.FlappingStart", "FlappingStart");
+	ScriptGlobal::Set("Constants.FlappingEnd", "FlappingEnd");
 
 	m_StateFilterMap["OK"] = StateFilterOK;
 	m_StateFilterMap["Warning"] = StateFilterWarning;

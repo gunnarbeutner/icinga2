@@ -35,7 +35,7 @@ class ScriptGlobal
 {
 public:
 	static Value Get(const String& name, const Value *defaultValue = nullptr);
-	static void Set(const String& name, const Value& value);
+	static void Set(const String& name, const Value& value, bool ignoreFrozen = true);
 	static bool Exists(const String& name);
 
 	static void WriteToFile(const String& filename);

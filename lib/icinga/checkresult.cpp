@@ -26,13 +26,13 @@ using namespace icinga;
 REGISTER_TYPE(CheckResult);
 
 INITIALIZE_ONCE([]() {
-	ScriptGlobal::Set("ServiceOK", ServiceOK);
-	ScriptGlobal::Set("ServiceWarning", ServiceWarning);
-	ScriptGlobal::Set("ServiceCritical", ServiceCritical);
-	ScriptGlobal::Set("ServiceUnknown", ServiceUnknown);
+	ScriptGlobal::Set("Constants.ServiceOK", ServiceOK);
+	ScriptGlobal::Set("Constants.ServiceWarning", ServiceWarning);
+	ScriptGlobal::Set("Constants.ServiceCritical", ServiceCritical);
+	ScriptGlobal::Set("Constants.ServiceUnknown", ServiceUnknown);
 
-	ScriptGlobal::Set("HostUp", HostUp);
-	ScriptGlobal::Set("HostDown", HostDown);
+	ScriptGlobal::Set("Constants.HostUp", HostUp);
+	ScriptGlobal::Set("Constants.HostDown", HostDown);
 })
 
 double CheckResult::CalculateExecutionTime() const

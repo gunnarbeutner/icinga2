@@ -164,15 +164,15 @@ static int Main()
 
 	ScriptGlobal::Set("AttachDebugger", false);
 
-	ScriptGlobal::Set("PlatformKernel", Utility::GetPlatformKernel());
-	ScriptGlobal::Set("PlatformKernelVersion", Utility::GetPlatformKernelVersion());
-	ScriptGlobal::Set("PlatformName", Utility::GetPlatformName());
-	ScriptGlobal::Set("PlatformVersion", Utility::GetPlatformVersion());
-	ScriptGlobal::Set("PlatformArchitecture", Utility::GetPlatformArchitecture());
+	ScriptGlobal::Set("Constants.PlatformKernel", Utility::GetPlatformKernel());
+	ScriptGlobal::Set("Constants.PlatformKernelVersion", Utility::GetPlatformKernelVersion());
+	ScriptGlobal::Set("Constants.PlatformName", Utility::GetPlatformName());
+	ScriptGlobal::Set("Constants.PlatformVersion", Utility::GetPlatformVersion());
+	ScriptGlobal::Set("Constants.PlatformArchitecture", Utility::GetPlatformArchitecture());
 
-	ScriptGlobal::Set("BuildHostName", ICINGA_BUILD_HOST_NAME);
-	ScriptGlobal::Set("BuildCompilerName", ICINGA_BUILD_COMPILER_NAME);
-	ScriptGlobal::Set("BuildCompilerVersion", ICINGA_BUILD_COMPILER_VERSION);
+	ScriptGlobal::Set("Constants.BuildHostName", ICINGA_BUILD_HOST_NAME);
+	ScriptGlobal::Set("Constants.BuildCompilerName", ICINGA_BUILD_COMPILER_NAME);
+	ScriptGlobal::Set("Constants.BuildCompilerVersion", ICINGA_BUILD_COMPILER_VERSION);
 
 	String initconfig = Application::GetSysconfDir() + "/icinga2/init.conf";
 
@@ -528,6 +528,13 @@ static int Main()
 				<< " argument" << (command->GetMaxArguments() != 1 ? "s" : "") << " may be specified.";
 			return EXIT_FAILURE;
 		}
+
+		/* Make a number of global dictionaries read-only. */
+		for (const auto& name : { "System", "Deprecated", "Internal", "Constants" })
+			static_cast<Dictionary::Ptr>(ScriptGlobal::Get(name))->Freeze();
+
+		/* Make constants available globally */
+		ScriptFrame::AddImport(ScriptGlobal::Get("Constants"));
 
 		rc = command->Run(vm, args);
 	}

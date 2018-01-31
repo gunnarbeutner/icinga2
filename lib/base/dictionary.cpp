@@ -88,13 +88,14 @@ bool Dictionary::Get(const String& key, Value *result) const
  * Sets a value in the dictionary.
  *
  * @param key The key.
- * @param value The value.
+ * @tparam value The value.
+ * @param ignoreFrozen Whether to ignore frozen dictionaries and set the value anyway.
  */
-void Dictionary::Set(const String& key, Value value)
+void Dictionary::Set(const String& key, Value value, bool ignoreFrozen)
 {
 	ObjectLock olock(this);
 
-	if (m_Frozen)
+	if (!ignoreFrozen && m_Frozen)
 		BOOST_THROW_EXCEPTION(std::invalid_argument("Dictionary must not be modified."));
 
 	m_Data[key] = std::move(value);

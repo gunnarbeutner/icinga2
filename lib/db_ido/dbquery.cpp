@@ -29,22 +29,22 @@ std::map<String, int> DbQuery::m_CategoryFilterMap;
 
 void DbQuery::StaticInitialize()
 {
-	ScriptGlobal::Set("DbCatConfig", DbCatConfig);
-	ScriptGlobal::Set("DbCatState", DbCatState);
-	ScriptGlobal::Set("DbCatAcknowledgement", DbCatAcknowledgement);
-	ScriptGlobal::Set("DbCatComment", DbCatComment);
-	ScriptGlobal::Set("DbCatDowntime", DbCatDowntime);
-	ScriptGlobal::Set("DbCatEventHandler", DbCatEventHandler);
-	ScriptGlobal::Set("DbCatExternalCommand", DbCatExternalCommand);
-	ScriptGlobal::Set("DbCatFlapping", DbCatFlapping);
-	ScriptGlobal::Set("DbCatCheck", DbCatCheck);
-	ScriptGlobal::Set("DbCatLog", DbCatLog);
-	ScriptGlobal::Set("DbCatNotification", DbCatNotification);
-	ScriptGlobal::Set("DbCatProgramStatus", DbCatProgramStatus);
-	ScriptGlobal::Set("DbCatRetention", DbCatRetention);
-	ScriptGlobal::Set("DbCatStateHistory", DbCatStateHistory);
+	ScriptGlobal::Set("Constants.DbCatConfig", DbCatConfig);
+	ScriptGlobal::Set("Constants.DbCatState", DbCatState);
+	ScriptGlobal::Set("Constants.DbCatAcknowledgement", DbCatAcknowledgement);
+	ScriptGlobal::Set("Constants.DbCatComment", DbCatComment);
+	ScriptGlobal::Set("Constants.DbCatDowntime", DbCatDowntime);
+	ScriptGlobal::Set("Constants.DbCatEventHandler", DbCatEventHandler);
+	ScriptGlobal::Set("Constants.DbCatExternalCommand", DbCatExternalCommand);
+	ScriptGlobal::Set("Constants.DbCatFlapping", DbCatFlapping);
+	ScriptGlobal::Set("Constants.DbCatCheck", DbCatCheck);
+	ScriptGlobal::Set("Constants.DbCatLog", DbCatLog);
+	ScriptGlobal::Set("Constants.DbCatNotification", DbCatNotification);
+	ScriptGlobal::Set("Constants.DbCatProgramStatus", DbCatProgramStatus);
+	ScriptGlobal::Set("Constants.DbCatRetention", DbCatRetention);
+	ScriptGlobal::Set("Constants.DbCatStateHistory", DbCatStateHistory);
 
-	ScriptGlobal::Set("DbCatEverything", DbCatEverything);
+	ScriptGlobal::Set("Constants.DbCatEverything", DbCatEverything);
 
 	m_CategoryFilterMap["DbCatConfig"] = DbCatConfig;
 	m_CategoryFilterMap["DbCatState"] = DbCatState;

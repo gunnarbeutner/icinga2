@@ -105,7 +105,7 @@ void SocketEvents::InitializeEngine()
 
 	l_SocketIOEngine->Start();
 
-	ScriptGlobal::Set("EventEngine", eventEngine);
+	ScriptGlobal::Set("Constants.EventEngine", eventEngine);
 }
 
 /**

@@ -47,7 +47,7 @@ Value ScriptGlobal::Get(const String& name, const Value *defaultValue)
 	return result;
 }
 
-void ScriptGlobal::Set(const String& name, const Value& value)
+void ScriptGlobal::Set(const String& name, const Value& value, bool ignoreFrozen)
 {
 	std::vector<String> tokens = name.Split(".");
 
@@ -67,7 +67,7 @@ void ScriptGlobal::Set(const String& name, const Value& value)
 
 				if (!parent->Get(token, &vparent)) {
 					Dictionary::Ptr dict = new Dictionary();
-					parent->Set(token, dict);
+					parent->Set(token, dict, ignoreFrozen);
 					parent = dict;
 				} else {
 					parent = vparent;
@@ -75,7 +75,7 @@ void ScriptGlobal::Set(const String& name, const Value& value)
 			}
 		}
 
-		parent->Set(tokens[tokens.size() - 1], value);
+		parent->Set(tokens[tokens.size() - 1], value, ignoreFrozen);
 	}
 }
 

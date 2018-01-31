@@ -62,12 +62,13 @@ Value Array::Get(SizeType index) const
  *
  * @param index The index.
  * @param value The value.
+ * @param ignoreFrozen Whether to ignore frozen arrays and set the value anyway.
  */
-void Array::Set(SizeType index, const Value& value)
+void Array::Set(SizeType index, const Value& value, bool ignoreFrozen)
 {
 	ObjectLock olock(this);
 
-	if (m_Frozen)
+	if (!ignoreFrozen && m_Frozen)
 		BOOST_THROW_EXCEPTION(std::invalid_argument("Array must not be modified."));
 
 	m_Data.at(index) = value;
@@ -78,12 +79,13 @@ void Array::Set(SizeType index, const Value& value)
  *
  * @param index The index.
  * @param value The value.
+ * @param ignoreFrozen Whether to ignore frozen arrays and set the value anyway.
  */
-void Array::Set(SizeType index, Value&& value)
+void Array::Set(SizeType index, Value&& value, bool ignoreFrozen)
 {
 	ObjectLock olock(this);
 
-	if (m_Frozen)
+	if (!ignoreFrozen && m_Frozen)
 		BOOST_THROW_EXCEPTION(std::invalid_argument("Array must not be modified."));
 
 	m_Data.at(index).Swap(value);
@@ -93,8 +95,9 @@ void Array::Set(SizeType index, Value&& value)
  * Adds a value to the array.
  *
  * @param value The value.
+ * @param ignoreFrozen Whether to ignore frozen arrays and add the value anyway.
  */
-void Array::Add(Value value)
+void Array::Add(Value value, bool ignoreFrozen)
 {
 	ObjectLock olock(this);
 

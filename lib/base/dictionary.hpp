@@ -58,7 +58,7 @@ public:
 
 	Value Get(const String& key) const;
 	bool Get(const String& key, Value *result) const;
-	void Set(const String& key, Value value);
+	void Set(const String& key, Value value, bool ignoreFrozen = false);
 	bool Contains(const String& key) const;
 
 	Iterator Begin();

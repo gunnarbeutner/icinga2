@@ -38,5 +38,7 @@ INITIALIZE_ONCE([]() {
 		{ "decode", new Function("Json#decode", JsonDecode, { "value" }, true) }
 	});
 
+	jsonObj->Freeze();
+
 	ScriptGlobal::Set("Json", jsonObj);
 });

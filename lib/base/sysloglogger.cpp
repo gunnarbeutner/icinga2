@@ -35,26 +35,26 @@ std::map<String, int> SyslogLogger::m_FacilityMap;
 
 void SyslogLogger::StaticInitialize()
 {
-	ScriptGlobal::Set("FacilityAuth", "LOG_AUTH");
-	ScriptGlobal::Set("FacilityAuthPriv", "LOG_AUTHPRIV");
-	ScriptGlobal::Set("FacilityCron", "LOG_CRON");
-	ScriptGlobal::Set("FacilityDaemon", "LOG_DAEMON");
-	ScriptGlobal::Set("FacilityFtp", "LOG_FTP");
-	ScriptGlobal::Set("FacilityKern", "LOG_KERN");
-	ScriptGlobal::Set("FacilityLocal0", "LOG_LOCAL0");
-	ScriptGlobal::Set("FacilityLocal1", "LOG_LOCAL1");
-	ScriptGlobal::Set("FacilityLocal2", "LOG_LOCAL2");
-	ScriptGlobal::Set("FacilityLocal3", "LOG_LOCAL3");
-	ScriptGlobal::Set("FacilityLocal4", "LOG_LOCAL4");
-	ScriptGlobal::Set("FacilityLocal5", "LOG_LOCAL5");
-	ScriptGlobal::Set("FacilityLocal6", "LOG_LOCAL6");
-	ScriptGlobal::Set("FacilityLocal7", "LOG_LOCAL7");
-	ScriptGlobal::Set("FacilityLpr", "LOG_LPR");
-	ScriptGlobal::Set("FacilityMail", "LOG_MAIL");
-	ScriptGlobal::Set("FacilityNews", "LOG_NEWS");
-	ScriptGlobal::Set("FacilitySyslog", "LOG_SYSLOG");
-	ScriptGlobal::Set("FacilityUser", "LOG_USER");
-	ScriptGlobal::Set("FacilityUucp", "LOG_UUCP");
+	ScriptGlobal::Set("Constants.FacilityAuth", "LOG_AUTH");
+	ScriptGlobal::Set("Constants.FacilityAuthPriv", "LOG_AUTHPRIV");
+	ScriptGlobal::Set("Constants.FacilityCron", "LOG_CRON");
+	ScriptGlobal::Set("Constants.FacilityDaemon", "LOG_DAEMON");
+	ScriptGlobal::Set("Constants.FacilityFtp", "LOG_FTP");
+	ScriptGlobal::Set("Constants.FacilityKern", "LOG_KERN");
+	ScriptGlobal::Set("Constants.FacilityLocal0", "LOG_LOCAL0");
+	ScriptGlobal::Set("Constants.FacilityLocal1", "LOG_LOCAL1");
+	ScriptGlobal::Set("Constants.FacilityLocal2", "LOG_LOCAL2");
+	ScriptGlobal::Set("Constants.FacilityLocal3", "LOG_LOCAL3");
+	ScriptGlobal::Set("Constants.FacilityLocal4", "LOG_LOCAL4");
+	ScriptGlobal::Set("Constants.FacilityLocal5", "LOG_LOCAL5");
+	ScriptGlobal::Set("Constants.FacilityLocal6", "LOG_LOCAL6");
+	ScriptGlobal::Set("Constants.FacilityLocal7", "LOG_LOCAL7");
+	ScriptGlobal::Set("Constants.FacilityLpr", "LOG_LPR");
+	ScriptGlobal::Set("Constants.FacilityMail", "LOG_MAIL");
+	ScriptGlobal::Set("Constants.FacilityNews", "LOG_NEWS");
+	ScriptGlobal::Set("Constants.FacilitySyslog", "LOG_SYSLOG");
+	ScriptGlobal::Set("Constants.FacilityUser", "LOG_USER");
+	ScriptGlobal::Set("Constants.FacilityUucp", "LOG_UUCP");
 
 	m_FacilityMap["LOG_AUTH"] = LOG_AUTH;
 	m_FacilityMap["LOG_AUTHPRIV"] = LOG_AUTHPRIV;
