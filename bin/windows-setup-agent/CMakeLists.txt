@@ -15,7 +15,14 @@
 # along with this program; if not, write to the Free Software Foundation
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
-add_subdirectory(mkclass)
-add_subdirectory(mkembedconfig)
-add_subdirectory(mkunity)
+include_external_msproject(
+  icinga2setupagent
+  ${CMAKE_CURRENT_SOURCE_DIR}/Icinga2SetupAgent.csproj
+  TYPE FAE04EC0-301F-11D3-BF4B-00C04F79EFBC
+  PLATFORM Win32
+)
 
+install(
+  FILES ${CMAKE_CURRENT_SOURCE_DIR}/bin/\${CMAKE_INSTALL_CONFIG_NAME}/Icinga2SetupAgent.exe ${CMAKE_CURRENT_SOURCE_DIR}/bin/\${CMAKE_INSTALL_CONFIG_NAME}/Icinga2SetupAgent.exe.config
+  DESTINATION ${CMAKE_INSTALL_SBINDIR}
+)

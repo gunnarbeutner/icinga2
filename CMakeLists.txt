@@ -348,20 +348,13 @@ enable_testing()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+add_subdirectory(bin)
 add_subdirectory(third-party)
-add_subdirectory(tools)
 add_subdirectory(lib)
-add_subdirectory(icinga-app)
 add_subdirectory(etc)
 add_subdirectory(itl)
 add_subdirectory(doc)
-add_subdirectory(agent)
-add_subdirectory(plugins)
 add_subdirectory(choco)
-
-if(MSVC)
-  add_subdirectory(icinga-installer)
-endif()
 
 if(ICINGA2_WITH_TESTS)
   add_subdirectory(test)
