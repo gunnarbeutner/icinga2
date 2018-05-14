@@ -3,6 +3,7 @@
 # Icinga 2
 
 ![Icinga Logo](https://www.icinga.com/wp-content/uploads/2014/06/icinga_logo.png)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fgunnarbeutner%2Ficinga2.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fgunnarbeutner%2Ficinga2?ref=badge_shield)
 
 #### Table of Contents
 
@@ -46,6 +47,9 @@ file(s), but you are not obligated to do so. If you do not wish to do
 so, delete this exception statement from your version. If you delete
 this exception statement from all source files in the program, then
 also delete it here.
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fgunnarbeutner%2Ficinga2.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fgunnarbeutner%2Ficinga2?ref=badge_large)
 
 ## Installation
 
